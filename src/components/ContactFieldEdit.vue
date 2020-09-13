@@ -29,6 +29,9 @@
         <Button class="modal-footer__button" @click.native="addNewField" :disabled="disableBtn">
           <template v-slot:text>Ok</template>
         </Button>
+        <Button class="modal-footer__button" @click.native="cancel">
+          <template v-slot:text>Отмена</template>
+        </Button>
       </template>
     </Modal>
   </div>
@@ -44,11 +47,11 @@ export default {
   components: {
     Button,
     Modal,
-    Input
+    Input,
   },
   data: () => ({
     key: "",
-    value: ""
+    value: "",
   }),
   watch: {
     viewModalFieldEdit() {
@@ -56,12 +59,18 @@ export default {
     },
     currentFieldToEdit() {
       this.fieldToData();
-    }
+    },
   },
   computed: {
-    ...mapGetters("contactsStore", ["selectedContact", "viewModalFieldEdit", "currentFieldToEdit"]),
+    ...mapGetters("contactsStore", [
+      "selectedContact",
+      "viewModalFieldEdit",
+      "currentFieldToEdit",
+    ]),
     cantEditComp() {
-      return this.key === "id" ? `Не возможно редактировать ${this.key}` : "Редактировать";
+      return this.key === "id"
+        ? `Не возможно редактировать ${this.key}`
+        : "Редактировать";
     },
     disableBtn() {
       return this.key === "id" ? true : null;
@@ -71,7 +80,7 @@ export default {
     },
     disableValueInput() {
       return this.key === "id" ? true : null;
-    }
+    },
   },
   methods: {
     ...mapActions("contactsStore", ["updateContact", "setCurrentFieldToEdit"]),
@@ -93,12 +102,18 @@ export default {
       if (!this.key) document.querySelector("#key").classList.add("error");
       if (!this.value) document.querySelector("#value").classList.add("error");
     },
+    cancel() {
+      if (!confirm("Are you sure?")) {
+        return;
+      }
+      this.$refs.modal.show = false;
+    },
     removeError() {
       document
         .querySelectorAll("input")
-        .forEach(input => input.parentNode.classList.remove("error"));
-    }
-  }
+        .forEach((input) => input.parentNode.classList.remove("error"));
+    },
+  },
 };
 </script>
 <style scoped>
@@ -123,5 +138,10 @@ export default {
 }
 .error >>> input {
   border-color: red;
+}
+.modal-footer__button {
+  float: left;
+  width: 40%;
+  padding-left: 30px;
 }
 </style>
